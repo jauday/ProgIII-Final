@@ -1,0 +1,118 @@
+classDiagram
+    %% Controlador
+    class GameController {
+        -characterGenerator: CharacterGenerator
+        -logger: GameLogger
+        -ui: GameUI
+        +run() void
+        +startGame() void
+    }
+    
+    %% Modelo Principal - Jerarquía de Personajes
+    class Character {
+        <<abstract>>
+        #name: String
+        #race: Race
+        #health: int
+        #skill: int
+        #strength: int
+        #level: int
+        +attack(Character) int
+        +getDamageMultiplier()* double
+        +improveStat()* void
+        +isAlive() boolean
+    }
+    
+    class Human {
+        +getDamageMultiplier() double
+        +improveStat() void
+    }
+    
+    class Elf {
+        +getDamageMultiplier() double
+        +improveStat() void
+    }
+    
+    class Orc {
+        +getDamageMultiplier() double
+        +improveStat() void
+    }
+    
+    class Player {
+        -playerId: int
+        -characters: List~Character~
+        +addCharacter(Character) void
+        +hasAliveCharacters() boolean
+        +getAliveCharacters() List~Character~
+    }
+    
+    class Race {
+        <<enumeration>>
+        HUMAN
+        ELF
+        ORC
+    }
+    
+    %% Servicios
+    class Game {
+        -player1: Player
+        -player2: Player
+        -ui: GameUI
+        -logger: GameLogger
+        +startGame() void
+        +playRound() RoundResult
+        +executeCombat() RoundResult
+    }
+    
+    class CharacterGenerator {
+        +generateRandomCharacter() Character
+        +createManualCharacter() Character
+        -createCharacter() Character
+    }
+    
+    class GameLogger {
+        -logEntries: List~String~
+        +logAttack() void
+        +logGameResult() void
+        +saveToFile() void
+    }
+    
+    class GameUI {
+        +displayMenu() void
+        +displayCharacters() void
+        +showBattleStatus() void
+    }
+    
+    class RoundResult {
+        <<record>>
+        +gameEnded: boolean
+    }
+    
+    %% Excepciones
+    class GameException {
+        +GameException(String)
+    }
+    
+    class CombatException {
+        +CombatException(String)
+    }
+    
+    %% Relaciones Principales
+    GameController --> Game : creates
+    GameController --> CharacterGenerator : uses
+    GameController --> GameLogger : uses
+    GameController --> GameUI : uses
+    
+    Game --> Player : manages 2
+    Game --> RoundResult : returns
+    Player --> Character : contains 3
+    
+    Character <|-- Human
+    Character <|-- Elf  
+    Character <|-- Orc
+    Character --> Race : uses
+    
+    CharacterGenerator --> Character : creates
+    CharacterGenerator --> Race : uses
+    
+    GameException <|-- CombatException
