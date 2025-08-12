@@ -1,6 +1,7 @@
 package main.java.com.utn.rpg.exception;
 
 public class GameException extends RuntimeException {
+
     public GameException(String message) {
         super(message);
     }

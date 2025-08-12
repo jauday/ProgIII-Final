@@ -11,6 +11,7 @@ import main.java.com.utn.rpg.service.GameLogger;
 import main.java.com.utn.rpg.service.GameUI;
 
 public class GameController {
+
     private final Scanner scanner;
     private final CharacterGenerator characterGenerator;
     private final GameLogger logger;
@@ -32,22 +33,15 @@ public class GameController {
             int choice = ui.getValidMenuChoice();
 
             switch (choice) {
-                case 1:
-                    startGameWithRandomCharacters();
-                    break;
-                case 2:
-                    startGameWithManualCharacters();
-                    break;
-                case 3:
-                    readGameLogs();
-                    break;
-                case 4:
-                    clearGameLogs();
-                    break;
-                case 5:
+                case 1 -> startGameWithRandomCharacters();
+                case 2 -> startGameWithManualCharacters();
+                case 3 -> readGameLogs();
+                case 4 -> clearGameLogs();
+                case 5 -> {
                     running = false;
                     System.out.println("Gracias por jugar! El Trono de Hierrron te espera.");
-                    break;
+                }
+                default -> throw new IllegalStateException("Unexpected value: " + choice);
             }
         }
         scanner.close();
@@ -71,7 +65,7 @@ public class GameController {
             int playerId = (i <= 3) ? 1 : 2;
             int charNumber = (i <= 3) ? i : i - 3;
 
-            System.out.println(String.format("\n--- Creando Personaje %d Para el jugador %d ---", charNumber, playerId));
+            System.out.printf("\n--- Creando Personaje %d Para el jugador %d ---%n", charNumber, playerId);
             Character character = characterGenerator.createManualCharacter();
             characters.add(character);
 

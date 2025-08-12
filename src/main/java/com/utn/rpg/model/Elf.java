@@ -16,7 +16,7 @@ public class Elf extends Character {
 
     @Override
     public void improveStat() {
-        this.health = Math.min(MAX_HEALTH, this.health + 12);
+        this.skill = Math.min(MAX_SKILL, this.skill + 1);
     }
 
     @Override

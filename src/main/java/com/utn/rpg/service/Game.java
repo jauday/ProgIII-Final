@@ -9,6 +9,7 @@ import main.java.com.utn.rpg.model.Player;
 import main.java.com.utn.rpg.model.RoundResult;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -57,7 +58,7 @@ public class Game {
         if (characters.size() != 6) {
             throw new GameException("Exactamente 6 personajes son necesarios se encontraron: " + characters.size());
         }
-        if (characters.stream().anyMatch(c -> c == null)) {
+        if (characters.stream().anyMatch(Objects::isNull)) {
             throw new GameException("Todos los personajes deben ser no nulos");
         }
     }
@@ -88,12 +89,11 @@ public class Game {
                 Thread.sleep(1000);
 
                 RoundResult result = playRound();
-                logger.displayCurrentLog();
+                //logger.displayCurrentLog();
 
-                if (result.isGameEnded()) {
+                if (result.gameEnded()) {
                     break;
                 }
-
                 System.out.println("\nPresiona ENTER para continuar...");
                 scanner.nextLine();
                 currentRound++;
@@ -102,7 +102,7 @@ public class Game {
             System.out.println("\n=== FIN DEL JUEGO ===");
             Player winner = player1.hasAliveCharacters() ? player1 : player2;
             logger.logGameResult(winner);
-            logger.displayCurrentLog();
+            //logger.displayCurrentLog();
             logger.saveToFile();
 
         } catch (InterruptedException e) {
@@ -142,7 +142,7 @@ public class Game {
             List<Character> aliveChars2 = player2.getAliveCharacters();
 
             if (aliveChars1.isEmpty() || aliveChars2.isEmpty()) {
-                return new RoundResult(null, null, currentRound, true);
+                return new RoundResult( true);
             }
 
             Character char1 = selectRandomCharacter(aliveChars1);
@@ -166,35 +166,32 @@ public class Game {
         return characters.get(RANDOM.nextInt(characters.size()));
     }
 
-    private RoundResult executeCombat(Character char1, Character char2) {
+    private RoundResult executeCombat(Character char1, Character char2) throws InterruptedException {
         Character firstAttacker = (lastRoundLoser == 1) ? char1 : char2;
         Character secondAttacker = (firstAttacker == char1) ? char2 : char1;
-        Scanner scanner = new Scanner(System.in);
 
         for (int attack = 1; attack <= MAX_ATTACKS_PER_ROUND &&
                 char1.isAlive() && char2.isAlive(); attack++) {
 
             System.out.printf("\n=== Ataque %d/%d ===\n", attack, MAX_ATTACKS_PER_ROUND);
 
-            // First attack
             System.out.printf("\n%s se prepara para atacar a %s...\n",
                     firstAttacker.getName(), secondAttacker.getName());
-            System.out.println("Presiona ENTER para continuar...");
-            scanner.nextLine();
 
             executeSingleAttack(firstAttacker, secondAttacker);
             ui.showBattleStatus(char1, char2);
+            Thread.sleep(1000);
 
-            if (!secondAttacker.isAlive()) break;
+            if (!secondAttacker.isAlive()) {
+                break;
+            }
 
-            // Second attack
             System.out.printf("\n%s contraataca a %s...\n",
                     secondAttacker.getName(), firstAttacker.getName());
-            System.out.println("Presiona ENTER para continuar...");
-            scanner.nextLine();
 
             executeSingleAttack(secondAttacker, firstAttacker);
             ui.showBattleStatus(char1, char2);
+            Thread.sleep(100);
         }
 
         return determineRoundResult(char1, char2);
@@ -210,18 +207,12 @@ public class Game {
     }
 
     private RoundResult determineRoundResult(Character char1, Character char2) {
-        Character winner = null;
-        Character loser = null;
 
         if (!char1.isAlive() && char2.isAlive()) {
-            winner = char2;
-            loser = char1;
             lastRoundLoser = 1;
             char2.improveStat();
             logger.logCharacterDeath(char1, char2);
         } else if (!char2.isAlive() && char1.isAlive()) {
-            winner = char1;
-            loser = char2;
             lastRoundLoser = 2;
             char1.improveStat();
             logger.logCharacterDeath(char2, char1);
@@ -230,6 +221,6 @@ public class Game {
         }
 
         boolean gameEnded = !player1.hasAliveCharacters() || !player2.hasAliveCharacters();
-        return new RoundResult(winner, loser, currentRound, gameEnded);
+        return new RoundResult( gameEnded);
     }
 }

@@ -16,7 +16,7 @@ public class Human extends Character {
 
     @Override
     public void improveStat() {
-        this.health = Math.min(MAX_HEALTH, this.health + 10);
+        this.level = Math.min(MAX_LEVEL, this.level + 1);
     }
 
     @Override

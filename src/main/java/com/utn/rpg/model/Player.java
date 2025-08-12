@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import main.java.com.utn.rpg.exception.GameException;
+
 public class Player {
+
     private final int playerId;
     private final List<Character> characters;
 
@@ -17,12 +20,8 @@ public class Player {
         if (characters.size() < 3) {
             characters.add(character);
         } else {
-            throw new IllegalStateException("El jugador ya tiene 3 personajes.");
+            throw new GameException("El jugador ya tiene 3 personajes.");
         }
-    }
-
-    public void removeCharacter(Character character) {
-        characters.remove(character);
     }
 
     public boolean hasAliveCharacters() {

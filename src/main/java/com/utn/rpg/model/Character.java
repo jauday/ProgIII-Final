@@ -4,8 +4,11 @@ import java.time.LocalDate;
 import java.util.Random;
 
 public abstract class Character {
+
     protected static final Random RANDOM = new Random();
     protected static final int MAX_HEALTH = 100;
+    protected static final int MAX_LEVEL = 10;
+    protected static final int MAX_SKILL = 5;
 
     protected final String name;
     protected final String nickname;
@@ -15,9 +18,9 @@ public abstract class Character {
 
     protected int health;
     protected final int speed;
-    protected final int skill;
+    protected int skill;
     protected final int strength;
-    protected final int level;
+    protected int level;
     protected final int armor;
 
     public Character(String name, String nickname, Race race, LocalDate birthDate,
@@ -38,20 +41,19 @@ public abstract class Character {
 
     public int attack(Character defender) {
         int powerShot = this.skill * this.strength * this.level;
-        int effectiveness = RANDOM.nextInt(100) + 1;
-        int attackValue = (powerShot * effectiveness) / 100;
+        double effectiveness = (double) (RANDOM.nextInt(100) + 1) / 100.0;
+        double attackValue = powerShot * effectiveness;
         int defenseValue = defender.armor * defender.speed;
 
-        double baseDamage = ((double)(attackValue - defenseValue) / 500) * 100;
+        double baseDamage = ((attackValue - defenseValue) / 500) * 100;
         double finalDamage = baseDamage * getDamageMultiplier();
 
-        int damage = Math.max(0, (int)Math.round(finalDamage));
+        int damage = Math.max(0, (int) Math.round(finalDamage));
         defender.takeDamage(damage);
 
         return damage;
     }
 
-    // Metodo abstracto para que cada raza implemente su propio multiplicador de daño
     protected abstract double getDamageMultiplier();
 
     public void takeDamage(int damage) {
@@ -62,17 +64,66 @@ public abstract class Character {
         return this.health > 0;
     }
 
-    public abstract void improveStat(); // Cada Raza mejora de manera distinta
-    
-    public String getName() { return name; }
-    public String getNickname() { return nickname; }
-    public int getHealth() { return health; }
-    public String getRace(){return race.toString();}
+    public abstract void improveStat();
+
+    public String getName() {
+        return name;
+    }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+
+    public String getRace() {
+        return race.toString();
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public int getSkill() {
+        return skill;
+    }
 
     @Override
     public String toString() {
         return String.format(
-                "Nombre: %s, Apodo: %s, Raza: %s, Salud: %d, Velocidad: %d, Destreza: %d, Fuerza: %d, Nivel: %d, Armadura: %d, Edad: %d",
-                name, nickname, race, health, speed, skill, strength, level, armor, age);
+                """
+                        ┌─ %s (%s) ─ %s ─ Nivel %d ─ Edad %d
+                        ├─ Atributos:
+                        │  ❤️  Salud    [%s] %d
+                        │  ⚡ Velocidad  [%s] %d
+                        │  🎯 Destreza  [%s] %d
+                        │  💪 Fuerza    [%s] %d
+                        │  🛡️  Armadura [%s] %d
+                        └─────────────────────────────""",
+
+                name, nickname, race, level, age,
+                createProgressBar(health, 100), health,
+                createProgressBar(speed, 10), speed,
+                createProgressBar(skill, 5), skill,
+                createProgressBar(strength, 10), strength,
+                createProgressBar(armor, 10), armor
+        );
+    }
+
+    private String createProgressBar(int value, int max) {
+        int barLength = 10;
+        int filledLength = (int) ((double) value / max * barLength);
+        StringBuilder bar = new StringBuilder();
+
+        for (int i = 0; i < barLength; i++) {
+            if (i < filledLength) {
+                bar.append("█");
+            } else {
+                bar.append("░");
+            }
+        }
+        return bar.toString();
     }
 }

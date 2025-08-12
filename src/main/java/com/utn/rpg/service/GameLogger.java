@@ -12,6 +12,7 @@ import main.java.com.utn.rpg.model.Character;
 import main.java.com.utn.rpg.model.Player;
 
 public class GameLogger {
+
     private static final String LOG_FILE_PATH = "logs/game_log.txt";
     private final List<String> logEntries;
     private final DateTimeFormatter formatter;
@@ -55,13 +56,24 @@ public class GameLogger {
 
     public void logAttack(Character attacker, Character defender, int damage) {
         logEntries.add(String.format("%s Ataca a %s y genera %d daño. %s tiene %d salud restante.",
-                attacker.getNickname(), defender.getNickname(), damage,
-                defender.getNickname(), defender.getHealth()));
+                attacker.getName(), defender.getName(), damage,
+                defender.getName(), defender.getHealth()));
+        System.out.printf("%s Ataca a %s y genera %d daño. %s tiene %d salud restante.%n",
+                attacker.getName(), defender.getName(), damage,
+                defender.getName(), defender.getHealth());
     }
 
     public void logCharacterDeath(Character deadCharacter, Character winner) {
-        logEntries.add(String.format("%s murió! %s gana el round y obtiene +10 de salud (Salud actual: %d).",
-                deadCharacter.getNickname(), winner.getNickname(), winner.getHealth()));
+        String winnerType = winner.getClass().getSimpleName();
+        String additionalInfo = switch (winnerType) {
+            case "Orc" -> String.format(" +8 de Salud (Salud actual: %d).", winner.getHealth());
+            case "Human" -> String.format(" +1 de Nivel (Nivel actual: %d).", winner.getLevel());
+            case "Elf" -> String.format(" +1 de Habilidad (Habilidad actual: %d).", winner.getSkill());
+            default -> ".";
+        };
+
+        logEntries.add(String.format("%s murió! %s %s gana el round y obtiene%s",
+                deadCharacter.getName(), winner.getName(), winner.getNickname(), additionalInfo));
     }
 
     public void logRoundDraw() {
@@ -82,7 +94,7 @@ public class GameLogger {
             for (String entry : logEntries) {
                 writer.println(entry);
             }
-            writer.println(); // Extra line between games
+            writer.println();
             System.out.println("Logs guardados exitosamente en " + LOG_FILE_PATH);
         } catch (IOException e) {
             System.err.println("Error guardando los logs: " + e.getMessage());

@@ -9,6 +9,7 @@ import main.java.com.utn.rpg.exception.GameException;
 import main.java.com.utn.rpg.model.Character;
 
 public class GameUI {
+
     private final Scanner scanner;
     private final GameLogger logger;
 
@@ -63,22 +64,16 @@ public class GameUI {
                 if (value >= min && value <= max) {
                     return value;
                 }
-                System.out.println(String.format("Por favor, ingrese un numero entre %d y %d.", min, max));
+                System.out.printf("Por favor, ingrese un numero entre %d y %d.%n", min, max);
             } catch (NumberFormatException e) {
                 System.out.println("Ingrese un numero valido.");
             }
         }
     }
 
-
-    public void waitForEnter() {
-        System.out.println("Presiona ENTER para continuar...");
-        scanner.nextLine();
-    }
-
     public void showBattleStatus(Character char1, Character char2) {
         System.out.println("\nEstado de la batalla:");
-        System.out.printf("%s: %d/%d HP\n", char1.getName(), char1.getHealth(), FULL_HEALTH);
-        System.out.printf("%s: %d/%d HP\n", char2.getName(), char2.getHealth(), FULL_HEALTH);
+        System.out.printf("%s: %d/%d Salud\n", char1.getName(), char1.getHealth(), FULL_HEALTH);
+        System.out.printf("%s: %d/%d Salud\n", char2.getName(), char2.getHealth(), FULL_HEALTH);
     }
 }

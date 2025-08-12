@@ -1,10 +1,12 @@
 package main.java.com.utn.rpg.service;
 
+import main.java.com.utn.rpg.exception.GameException;
 import main.java.com.utn.rpg.model.Character;
 import main.java.com.utn.rpg.model.Elf;
 import main.java.com.utn.rpg.model.Human;
 import main.java.com.utn.rpg.model.Orc;
 import main.java.com.utn.rpg.model.Race;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class CharacterGenerator {
+
     private static final Random RANDOM = new Random();
 
     private static final String[] NAMES = {
@@ -53,16 +56,11 @@ public class CharacterGenerator {
 
     private Character createCharacter(Race race, String name, String nickname, LocalDate birthDate,
             int age, int speed, int dexterity, int strength, int level, int armor) {
-        switch (race) {
-            case HUMAN:
-                return new Human(name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
-            case ELF:
-                return new Elf(name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
-            case ORC:
-                return new Orc(name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
-            default:
-                throw new IllegalArgumentException("Raza Desconocida: " + race);
-        }
+        return switch (race) {
+            case HUMAN -> new Human(name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
+            case ELF -> new Elf(name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
+            case ORC -> new Orc(name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
+        };
     }
 
     public List<Character> generateRandomCharacters(int count) {
@@ -100,37 +98,23 @@ public class CharacterGenerator {
         int level = ui.getValidIntInput("Nivel (1-10): ", 1, 10);
         int armor = ui.getValidIntInput("Armadura (1-10): ", 1, 10);
 
-        return createCharacterByRace(race, name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
-    }
-
-    private Character createCharacterByRace(Race race, String name, String nickname, LocalDate birthDate,
-            int age, int speed, int dexterity, int strength, int level, int armor) {
-        switch (race) {
-            case HUMAN:
-                return new Human(name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
-            case ELF:
-                return new Elf(name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
-            case ORC:
-                return new Orc(name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
-            default:
-                throw new IllegalArgumentException("Raza Desconocida: " + race);
-        }
+        return createCharacter(race, name, nickname, birthDate, age, speed, dexterity, strength, level, armor);
     }
 
     private Race chooseRace() {
         System.out.println("\nElija la raza del personaje:");
-        System.out.println("1. Humano (Daño x1.0, +10 salud cuando gana)");
+        System.out.println("1. Humano (Daño x1.0, +1 nivel cuando gana)");
         System.out.println("2. Elfo (Daño x1.05, +12 salud cuando gana)");
         System.out.println("3. Orco (Daño x1.1, +8 salud cuando gana)");
 
         int choice = ui.getValidIntInput("Seleccionar Raza (1-3): ", 1, 3);
 
-        switch (choice) {
-            case 1: return Race.HUMAN;
-            case 2: return Race.ELF;
-            case 3: return Race.ORC;
-            default: return Race.HUMAN; // Should never happen due to validation
-        }
+        return switch (choice) {
+            case 1 -> Race.HUMAN;
+            case 2 -> Race.ELF;
+            case 3 -> Race.ORC;
+            default -> throw new GameException("Raza no válida seleccionada. Por favor, elija una raza válida.");
+        };
     }
 
 }
